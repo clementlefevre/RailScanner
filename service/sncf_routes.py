@@ -1,23 +1,25 @@
 # coding: utf-8
 
+import time
 import json
 import pandas as pd
 import requests
 from datetime import datetime
+import pprint
 
-# import ipdb
+
+#import ipdb
 
 
 from config import URL, headers
 
 
 def get_data(origin="Aurillac", destination="Brive la Gaillarde", date_trip=datetime.now().isoformat()):
-    print date_trip
+
     null = 'null'
     false = 'false'
     true = 'true'
-    print origin
-    print destination
+    print type(date_trip), date_trip
 
     #destinationCode = "FRCFE"
 
@@ -27,7 +29,7 @@ def get_data(origin="Aurillac", destination="Brive la Gaillarde", date_trip=date
                "directTravel": false, "asymmetrical": false,
                "professional": false,
                "customerAccount": false, "oneWayTravel": true,
-               "departureDate": "2017-08-21T13:00:00", "returnDate": null,
+               "departureDate": date_trip, "returnDate": null,
                "travelClass": "SECOND", "country": "FR", "language": "fr",
                "busBestPriceOperator": null, "busOnly": false, "passengers": [
                    {"travelerId": null, "profile": "ADULT",
@@ -49,15 +51,25 @@ def get_data(origin="Aurillac", destination="Brive la Gaillarde", date_trip=date
     return payload
 
 
+def add_min_price(df):
+    price_cols = [col for col in df.columns if 'price' in col]
+    df['min_price'] = df[price_cols].min(skipna=True, axis=1)
+    return df
+
+
 def get_routes(origin="Aurillac", destination="Brive la Gaillarde", date_trip=datetime.now().isoformat()):
     data = get_data(origin, destination, date_trip)
     response = requests.request("POST", URL, data=data, headers=headers)
-
+    print "sleep"
+    time.sleep(5)
+    print "wake up"
     response_dict = response.json()
-    print response_dict
-    result_dict = response_dict['results']
 
-    df = concat_results(result_dict)
+    result_list = response_dict['results']
+
+    print "\n Itineraries found for {0}-{1}: {2}\n".format(origin, destination, len(result_list))
+    df = concat_results(result_list)
+    df = add_min_price(df)
     return df
 
 
@@ -66,6 +78,13 @@ def convert_result_to_dataframe(result):
     df = pd.DataFrame()
 
     df = pd.DataFrame.from_records(result['segments'])
+    if result['pushProposalType'] == 'BUS':
+        print "BUUUUUUUUUS"
+        return
+
+    if result['unsellableReason'] == "FULL_TRAIN":
+        print "FULL TRAIN"
+        return
 
     df[['departureDate', 'arrivalDate']] = df[['departureDate', 'arrivalDate']
                                               ].applymap(lambda x: pd.to_datetime(x, format="%Y-%m-%dT%H:%M:%S"))
@@ -76,9 +95,10 @@ def convert_result_to_dataframe(result):
     df['unsellableReason'] = result['unsellableReason']
     df['TGV'] = 'TGV' in df['transporter'].values
     df['total_trains'] = df.shape[0]
+    df['trip_rank'] = df.index
 
     for price_key in result['priceProposals'].keys():
-        df[''.join(["priresult_dictce_", price_key])] = result[
+        df[''.join(["price_", price_key])] = result[
             'priceProposals'][price_key]['amount']
 
     return df
@@ -86,13 +106,14 @@ def convert_result_to_dataframe(result):
 
 def concat_results(json_result):
     df = pd.DataFrame()
-    print "Results FOUND : {}\n".format(len(json_result))
+
     for result in json_result:
 
         try:
             df_result = convert_result_to_dataframe(result)
+
             df = pd.concat([df, df_result], axis=0)
         except Exception as e:
-            print "error for {}".format(result)
-            print e.args
+            print "error for {}\n \n".format(result)
+            print "error rootacause : \n \n", e.args
     return df
