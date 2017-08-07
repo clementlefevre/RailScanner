@@ -3,22 +3,45 @@
 import json
 import pandas as pd
 import requests
-#import ipdb
+from datetime import datetime
+
+# import ipdb
 
 
 from config import URL, headers
 
 
-def get_data(origin, destination, date):
-
+def get_data(origin="Aurillac", destination="Brive la Gaillarde", date_trip=datetime.now().isoformat()):
+    print date_trip
     null = 'null'
     false = 'false'
     true = 'true'
-    destination = "Brive-la-Gaillarde"
-    destinationCode = "FRBVE"
+    print origin
+    print destination
 
-    payload = {"origin": "Aurillac", "originCode": "FRAUR", "originLocation": null, "destination": "Clermont-Ferrand", "destinationCode": destinationCode, "destinationLocation": null, "directTravel": false, "asymmetrical": false, "professional": false, "customerAccount": false, "oneWayTravel": true, "departureDate": "2017-08-21T13:00:00", "returnDate": null, "travelClass": "SECOND", "country": "FR", "language": "fr", "busBestPriceOperator": null, "busOnly": false, "passengers": [
-        {"travelerId": null, "profile": "ADULT", "age": 26, "birthDate": null, "fidelityCardType": "NONE", "fidelityCardNumber": null, "commercialCardNumber": null, "commercialCardType": "NONE", "promoCode": "", "lastName": null, "firstName": null, "phoneNumer": null, "hanInformation": null}], "animals": [], "bike": "NONE", "withRecliningSeat": false, "physicalSpace": null, "fares": [], "withBestPrices": false, "highlightedTravel": null, "nextOrPrevious": false, "source": "FORM_SUBMIT", "targetPrice": null, "han": false, "$initial": true, "$queryId": "SRlEN"}
+    #destinationCode = "FRCFE"
+
+    payload = {"origin": origin, "originCode": null,
+               "originLocation": null, "destination": destination,
+               "destinationCode": null, "destinationLocation": null,
+               "directTravel": false, "asymmetrical": false,
+               "professional": false,
+               "customerAccount": false, "oneWayTravel": true,
+               "departureDate": "2017-08-21T13:00:00", "returnDate": null,
+               "travelClass": "SECOND", "country": "FR", "language": "fr",
+               "busBestPriceOperator": null, "busOnly": false, "passengers": [
+                   {"travelerId": null, "profile": "ADULT",
+                    "age": 26, "birthDate": null, "fidelityCardType": "NONE",
+                    "fidelityCardNumber": null, "commercialCardNumber": null,
+                    "commercialCardType": "NONE", "promoCode": "",
+                    "lastName": null,
+                    "firstName": null, "phoneNumer": null,
+                    "hanInformation": null}],
+               "animals": [], "bike": "NONE", "withRecliningSeat": false,
+               "physicalSpace": null, "fares": [], "withBestPrices": false,
+               "highlightedTravel": null, "nextOrPrevious": false,
+               "source": "FORM_SUBMIT", "targetPrice": null, "han": false,
+               "$initial": true, "$queryId": "SRlEN"}
 
     payload = json.dumps(payload)
     payload = payload.replace("\"null\"", "null").replace(
@@ -26,11 +49,12 @@ def get_data(origin, destination, date):
     return payload
 
 
-def get_routes(origin, destination, date):
-    data = get_data(origin, destination, date)
+def get_routes(origin="Aurillac", destination="Brive la Gaillarde", date_trip=datetime.now().isoformat()):
+    data = get_data(origin, destination, date_trip)
     response = requests.request("POST", URL, data=data, headers=headers)
 
     response_dict = response.json()
+    print response_dict
     result_dict = response_dict['results']
 
     df = concat_results(result_dict)
