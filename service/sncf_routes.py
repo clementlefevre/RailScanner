@@ -19,9 +19,6 @@ def get_data(origin="Aurillac", destination="Brive la Gaillarde", date_trip=date
     null = 'null'
     false = 'false'
     true = 'true'
-    print type(date_trip), date_trip
-
-    #destinationCode = "FRCFE"
 
     payload = {"origin": origin, "originCode": null,
                "originLocation": null, "destination": destination,
@@ -60,9 +57,9 @@ def add_min_price(df):
 def get_routes(origin="Aurillac", destination="Brive la Gaillarde", date_trip=datetime.now().isoformat()):
     data = get_data(origin, destination, date_trip)
     response = requests.request("POST", URL, data=data, headers=headers)
-    print "sleep"
+
     time.sleep(5)
-    print "wake up"
+
     response_dict = response.json()
 
     result_list = response_dict['results']
@@ -96,6 +93,8 @@ def convert_result_to_dataframe(result):
     df['TGV'] = 'TGV' in df['transporter'].values
     df['total_trains'] = df.shape[0]
     df['trip_rank'] = df.index
+    df['trip_departureDate'] = result['departureDate']
+    df['trip_arrivalDate'] = result['arrivalDate']
 
     for price_key in result['priceProposals'].keys():
         df[''.join(["price_", price_key])] = result[
