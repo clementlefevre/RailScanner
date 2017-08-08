@@ -2,19 +2,25 @@
 
 import time
 import json
+import numpy as np
 import pandas as pd
+from sqlalchemy import create_engine
 import requests
 from datetime import datetime
 import pprint
+from config import URL, headers, DB_NAME
 
 
 #import ipdb
 
+COLS_PRICE = ['price_FLEX', 'price_NOFLEX', 'price_SEMIFLEX', 'price_UPSELL']
+COLS_DATE = ['departureDate', 'arrivalDate',
+             'trip_departureDate', 'trip_arrivalDate', 'scrapped_on']
 
-from config import URL, headers
+COLS_TIMEDELTA = ['total_duration']
 
 
-def get_data(origin="Aurillac", destination="Brive la Gaillarde", date_trip=datetime.now().isoformat()):
+def get_data(origin, destination, date_trip):
 
     null = 'null'
     false = 'false'
@@ -36,7 +42,7 @@ def get_data(origin="Aurillac", destination="Brive la Gaillarde", date_trip=date
                     "lastName": null,
                     "firstName": null, "phoneNumer": null,
                     "hanInformation": null}],
-               "animals": [], "bike": "NONE", "withRecliningSeat": false,
+               "animals": [], "bike": "UNFOLDABLE", "withRecliningSeat": false,
                "physicalSpace": null, "fares": [], "withBestPrices": false,
                "highlightedTravel": null, "nextOrPrevious": false,
                "source": "FORM_SUBMIT", "targetPrice": null, "han": false,
@@ -54,11 +60,31 @@ def add_min_price(df):
     return df
 
 
-def get_routes(origin="Aurillac", destination="Brive la Gaillarde", date_trip=datetime.now().isoformat()):
-    data = get_data(origin, destination, date_trip)
-    response = requests.request("POST", URL, data=data, headers=headers)
+def add_scraping_timestamp(df):
+    df['scrapped_on'] = datetime.now().isoformat()
+    return df
 
-    time.sleep(5)
+
+def add_missing_cols_price(df):
+    for col in COLS_PRICE:
+        if col not in df:
+            df[col] = None
+            df[col] = pd.to_numeric(df[col])
+
+    return df
+
+
+def get_routes(origin, destination, date_trip=datetime.now().isoformat()):
+    data = get_data(origin, destination, date_trip)
+
+    try:
+        response = requests.request("POST", URL, data=data, headers=headers)
+        response.raise_for_status()
+    except Exception as e:
+        print e
+        return
+
+    time.sleep(.2)
 
     response_dict = response.json()
 
@@ -67,6 +93,9 @@ def get_routes(origin="Aurillac", destination="Brive la Gaillarde", date_trip=da
     print "\n Itineraries found for {0}-{1}: {2}\n".format(origin, destination, len(result_list))
     df = concat_results(result_list)
     df = add_min_price(df)
+
+    df = add_scraping_timestamp(df)
+
     return df
 
 
@@ -76,12 +105,20 @@ def convert_result_to_dataframe(result):
 
     df = pd.DataFrame.from_records(result['segments'])
     if result['pushProposalType'] == 'BUS':
-        print "BUUUUUUUUUS"
+        print "BUS"
         return
 
     if result['unsellableReason'] == "FULL_TRAIN":
         print "FULL TRAIN"
         return
+
+    if 'CAR' in df.trainType.values:
+        print "AUTOCAR"
+        return
+
+    # if np.sum(df.trainType != 'TER') > 0:
+    #     print "NOT ONLY TER"
+    #     return
 
     df[['departureDate', 'arrivalDate']] = df[['departureDate', 'arrivalDate']
                                               ].applymap(lambda x: pd.to_datetime(x, format="%Y-%m-%dT%H:%M:%S"))
@@ -90,7 +127,7 @@ def convert_result_to_dataframe(result):
     df['trip_name'] = u' to '.join([result['origin'], result['destination']])
     df['trip_id'] = result['id']
     df['unsellableReason'] = result['unsellableReason']
-    df['TGV'] = 'TGV' in df['transporter'].values
+    df['has_TGV'] = 'TGV' in df['transporter'].values
     df['total_trains'] = df.shape[0]
     df['trip_rank'] = df.index
     df['trip_departureDate'] = result['departureDate']
@@ -100,6 +137,29 @@ def convert_result_to_dataframe(result):
         df[''.join(["price_", price_key])] = result[
             'priceProposals'][price_key]['amount']
 
+    return df
+
+
+def save_to_db(df):
+
+    df = add_missing_cols_price(df)
+
+    df = df[['has_TGV',  'destination', 'destinationCode', 'duration', 'min_price',
+             'origin', 'originCode',  'total_duration',
+             'total_trains', 'trainNumber', 'trainPeriod', 'trainType',   'transporter',
+             'trip_id', 'trip_name',  'trip_rank',
+             'vehicleType'] + COLS_TIMEDELTA + COLS_DATE + COLS_PRICE]
+    disk_engine = create_engine('sqlite:///' + DB_NAME)
+    df.to_sql('sncf_trips', disk_engine, if_exists='append')
+
+
+def read_from_db():
+    disk_engine = create_engine('sqlite:///' + DB_NAME)
+    df = pd.read_sql_query('SELECT * FROM sncf_trips',
+                           disk_engine, parse_dates=COLS_DATE)
+
+    df[COLS_TIMEDELTA] = df[COLS_TIMEDELTA].applymap(
+        lambda x: pd.to_timedelta(x))
     return df
 
 
@@ -113,6 +173,6 @@ def concat_results(json_result):
 
             df = pd.concat([df, df_result], axis=0)
         except Exception as e:
-            print "error for {}\n \n".format(result)
+
             print "error rootacause : \n \n", e.args
     return df
