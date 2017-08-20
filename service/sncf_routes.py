@@ -2,12 +2,10 @@
 
 import time
 import json
-import numpy as np
 import pandas as pd
 from sqlalchemy import create_engine
 import requests
 from datetime import datetime
-import pprint
 from config import URL, headers, DB_NAME
 
 
