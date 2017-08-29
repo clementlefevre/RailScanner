@@ -161,6 +161,12 @@ def read_from_db():
     return df
 
 
+def convert_date_to_string(df):
+    df[COLS_DATE + COLS_TIMEDELTA] = df[COLS_DATE + COLS_TIMEDELTA].applymap(
+        lambda x: str(x))
+    return df
+
+
 def concat_results(json_result):
     df = pd.DataFrame()
 

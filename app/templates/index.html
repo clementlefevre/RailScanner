@@ -4,17 +4,17 @@
 <head>
     <meta charset="UTF-8">
 
-      <!-- Material Design fonts -->
-  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Roboto:300,400,500,700">
-  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/icon?family=Material+Icons">
+    <!-- Material Design fonts -->
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Roboto:300,400,500,700">
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="static/node_modules/bootstrap/dist/css/bootstrap.min.css">
-    
+
     <link rel="stylesheet" href="static/node_modules/bootstrap/dist/css/bootstrap-theme.min.css">
 
- 
-  <!-- Bootstrap Materialstatic/node_modules/bootstrap-material-design Design -->
-  <link rel="stylesheet" type="text/css" href="static/node_modules/bootstrap-material-design/dist/css/bootstrap-material-design.css">
-  <link rel="stylesheet" type="text/css" href="static/node_modules/bootstrap-material-design/dist/css/ripples.min.css">
+
+    <!-- Bootstrap Materialstatic/node_modules/bootstrap-material-design Design -->
+    <link rel="stylesheet" type="text/css" href="static/node_modules/bootstrap-material-design/dist/css/bootstrap-material-design.css">
+    <link rel="stylesheet" type="text/css" href="static/node_modules/bootstrap-material-design/dist/css/ripples.min.css">
 
 
     <!-- <link rel="stylesheet" href="static/css/index.css"> -->
@@ -60,15 +60,7 @@
 
         <!-- Nav tabs -->
         <ul class="nav nav-tabs" role="tablist">
-            <li role="presentation" class="active">
-                <a href="#pane-zero" aria-controls="zero" role="tab" data-toggle="tab">Zero</a>
-            </li>
-            <li role="presentation">
-                <a href="#pane-one" aria-controls="one" role="tab" data-toggle="tab">One</a>
-            </li>
-            <li role="presentation">
-                <a href="#pane-two" aria-controls="two" role="tab" data-toggle="tab">Two</a>
-            </li>
+           
             <li role="presentation">
                 <a href="#pane-three" aria-controls="three" role="tab" data-toggle="tab">Three</a>
             </li>
@@ -80,37 +72,7 @@
 
         <!-- Tab panes -->
         <div class="tab-content" style="margin-top: 10px">
-            <div role="tabpanel" class="tab-pane fade in active" id="pane-zero">
-                <div class="col-md-6">
-                    <div id="app-zero">
-                        <span v-bind:ts="ts">
-                        Side server timestamp: {% raw %}{{ ts }}{% endraw %}
-                  </span>
-
-                    </div>
-                </div>
-                <div class="col-md-6"></div>
-
-            </div>
-            <div role="tabpanel" class="tab-pane" id="pane-one">
-                <div id="app-one">
-                    <div>
-                        <one-list v-for="item in one_list" v-bind:item="item"></one-list>
-                    </div>
-                </div>
-            </div>
-
-            <div role="tabpanel" class="tab-pane" id="pane-two">
-                <div id="app-two">
-                    <ol>
-                        <li v-for="item in two_list">
-                            {% raw %}{{ item }}{% endraw %}
-                        </li>
-                    </ol>
-
-                </div>
-            </div>
-
+           
             <div role="tabpanel" class="tab-pane" id="pane-three">
                 <!-- demo root element -->
                 <div id="demo">
@@ -124,84 +86,16 @@
 
             <div role="tabpanel" class="tab-pane" id="pane-four">
                 <div id="app-four">
-                    <p> {% raw %}{{ message }}{% endraw %}  </p>
-                    <input v-model="message" type="email" class="form-control" id="i5p">
-                    <button v-on:click="reverseMessage">Reverse Message</button>
+                    
 
-                    <table class="table table-striped table-hover ">
-                        <thead>
-                        <tr>
-                          <th>#</th>
-                          <th>Column heading</th>
-                          <th>Column heading</th>
-                          <th>Column heading</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr>
-                          <td>1</td>
-                          <td>Column content</td>
-                          <td>Column content</td>
-                          <td>Column content</td>
-                        </tr>
-                        <tr>
-                          <td>2</td>
-                          <td>Column content</td>
-                          <td>Column content</td>
-                          <td>Column content</td>
-                        </tr>
-                        <tr class="info">
-                          <td>3</td>
-                          <td>Column content</td>
-                          <td>Column content</td>
-                          <td>Column content</td>
-                        </tr>
-                        <tr class="success">
-                          <td>4</td>
-                          <td>Column content</td>
-                          <td>Column content</td>
-                          <td>Column content</td>
-                        </tr>
-                        <tr class="danger">
-                          <td>5</td>
-                          <td>Column content</td>
-                          <td>Column content</td>
-                          <td>Column content</td>
-                        </tr>
-                        <tr class="warning">
-                          <td>6</td>
-                          <td>Column content</td>
-                          <td>Column content</td>
-                          <td>Column content</td>
-                        </tr>
-                        <tr class="active">
-                          <td>7</td>
-                          <td>Column content</td>
-                          <td>Column content</td>
-                          <td>Column content</td>
-                        </tr>
-                        </tbody>
-                      </table>
-                      
-                      
-
-                    <div class="form-group label-static">
-                        <label for="i2" class="control-label">label-static</label>
-                        <input type="email" class="form-control" id="i2" placeholder="placeholder attribute">
-                        <p class="help-block">This is a hint as a <code>p.help-block.hint</code></p>
-                      </div>
-                     
-                      <div class="form-group label-floating">
-                        <label for="i5" class="control-label">label-floating</label>
-                        <input type="email" class="form-control" id="i5">
-                        <span class="help-block">This is a hint as a <code>span.help-block.hint</code></span>
-                      </div>
-                     
-                      <div class="form-group label-placeholder">
-                        <label for="i5p" class="control-label">label-placeholder</label>
-                        <input type="email" class="form-control" id="i5p">
-                        <span class="help-block">This is a hint as a <code>span.help-block.hint</code></span>
-                      </div>
+                   <!-- demo root element -->
+                
+                    <form id="search">
+                        Search <input name="query" v-model="searchQuery">
+                    </form>
+                    <demo-grid :data="gridData" :columns="gridColumns" :filter-key="searchQuery">
+                    </demo-grid>
+               
                 </div>
             </div>
 
@@ -209,16 +103,6 @@
     </div>
 </body>
 
-<template id="template-one">
-    <div class="row" style="margin-bottom: 2px">
-        <div class="col-md-2"></div>
-        <div class="col-md-8">
-            {% raw %}
-            <p style="margin-bottom: 2px">{{ item }}</p>
-            {% endraw %}
-        </div>
-    </div>
-</template>
 
 <!-- component template -->
 <template id="grid-template">
@@ -241,10 +125,6 @@
         </tbody>
     </table>
 </template>
-
-
-
-
 
 
 
