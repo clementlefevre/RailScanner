@@ -1,4 +1,5 @@
-# coding: utf-8
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 
 import time
 import json
@@ -6,7 +7,7 @@ import pandas as pd
 from sqlalchemy import create_engine
 import requests
 from datetime import datetime
-from config import URL, headers, DB_NAME
+from app.config import URL, headers, DB_NAME
 
 
 #import ipdb
@@ -18,7 +19,7 @@ COLS_DATE = ['departureDate', 'arrivalDate',
 COLS_TIMEDELTA = ['total_duration']
 
 
-def get_data(origin, destination, date_trip):
+def get_data(origin, destination, date_trip=datetime.now().isoformat()):
 
     null = 'null'
     false = 'false'
@@ -82,7 +83,7 @@ def get_routes(origin, destination, date_trip=datetime.now().isoformat()):
         print e
         return
 
-    time.sleep(.2)
+    time.sleep(2)
 
     response_dict = response.json()
 
@@ -103,15 +104,15 @@ def convert_result_to_dataframe(result):
 
     df = pd.DataFrame.from_records(result['segments'])
     if result['pushProposalType'] == 'BUS':
-        print "BUS"
+        # print "BUS"
         return
 
-    if result['unsellableReason'] == "FULL_TRAIN":
-        print "FULL TRAIN"
-        return
+    # if result['unsellableReason'] == "FULL_TRAIN":
+    #     print "FULL TRAIN"
+    #     return
 
     if 'CAR' in df.trainType.values:
-        print "AUTOCAR"
+        # print "AUTOCAR"
         return
 
     # if np.sum(df.trainType != 'TER') > 0:
