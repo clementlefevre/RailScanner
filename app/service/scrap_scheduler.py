@@ -5,30 +5,37 @@ import logging
 import sys
 from itertools import product, permutations
 
-from app.config import LOGGING_PATH, ALL_TRIPS
-
-from app.model.trips import Trips
-from app.service.sncf_routes import get_data
+from app.config import LOGGING_FILENAME, ALL_TRIPS
+from app.model.client import Client
 
 
-logging.basicConfig(filename=LOGGING_PATH, level=logging.DEBUG)
-logger = logging.getLogger("scraper_sncf")
+logFormatter = logging.Formatter(
+    "%(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s]  %(message)s")
+rootLogger = logging.getLogger("scraper_sncf")
+rootLogger.setLevel(logging.INFO)
+
+fileHandler = logging.FileHandler(
+    "{0}/{1}.log".format("app/logs", LOGGING_FILENAME))
+fileHandler.setFormatter(logFormatter)
+rootLogger.addHandler(fileHandler)
+
+consoleHandler = logging.StreamHandler()
+consoleHandler.setFormatter(logFormatter)
+rootLogger.addHandler(consoleHandler)
 
 
 def job():
     wait_times_mn = random.randrange(1, 58, 1)
 
-    #time.sleep(wait_times_mn * 60)
-    trips = Trips(ALL_TRIPS)
-    print trips.legs
-    for leg in trips.legs:
-        get_data(leg[0], leg[1])
+    time.sleep(wait_times_mn * 60)
+    client = Client(ALL_TRIPS, horizon=40)
+    client.get_routes()
 
 
 def main():
-    logger.debug("start working...")
+    rootLogger.debug("start working...")
     job()
-    schedule.every(4).hours.do(job)
+    schedule.every(2).hours.do(job)
 
     while True:
         schedule.run_pending()
@@ -36,7 +43,4 @@ def main():
 
 
 if __name__ == '__main__':
-
-    print LOGGING_PATH
-
     main()

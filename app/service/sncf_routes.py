@@ -7,10 +7,12 @@ import pandas as pd
 from sqlalchemy import create_engine
 import requests
 from datetime import datetime
+import logging
 from app.config import URL, headers, DB_NAME
 
+logger = logging.getLogger("scraper_sncf")
 
-#import ipdb
+import ipdb
 
 COLS_PRICE = ['price_FLEX', 'price_NOFLEX', 'price_SEMIFLEX', 'price_UPSELL']
 COLS_DATE = ['departureDate', 'arrivalDate',
@@ -80,16 +82,19 @@ def get_routes(origin, destination, date_trip=datetime.now().isoformat()):
         response = requests.request("POST", URL, data=data, headers=headers)
         response.raise_for_status()
     except Exception as e:
-        print e
+        logger.error(
+            "Could not get schedule for {0}-{1} on {2}: ".format(origin, destination, date_trip))
+        logger.error(e)
         return
 
-    time.sleep(2)
+    time.sleep(10)
 
     response_dict = response.json()
 
     result_list = response_dict['results']
 
-    print "\n Itineraries found for {0}-{1}: {2}\n".format(origin, destination, len(result_list))
+    logger.info(
+        "\n Itineraries found for {0}-{1} on {2}: {3}\n".format(origin, destination, date_trip, len(result_list)))
     df = concat_results(result_list)
     df = add_min_price(df)
 
@@ -103,6 +108,8 @@ def convert_result_to_dataframe(result):
     df = pd.DataFrame()
 
     df = pd.DataFrame.from_records(result['segments'])
+
+    # ipdb.set_trace()
     if result['pushProposalType'] == 'BUS':
         # print "BUS"
         return
@@ -131,6 +138,7 @@ def convert_result_to_dataframe(result):
     df['trip_rank'] = df.index
     df['trip_departureDate'] = result['departureDate']
     df['trip_arrivalDate'] = result['arrivalDate']
+    #df['trainNumber'] = result['trainNumber']
 
     for price_key in result['priceProposals'].keys():
         df[''.join(["price_", price_key])] = result[
@@ -145,11 +153,13 @@ def save_to_db(df):
 
     df = df[['has_TGV',  'destination', 'destinationCode', 'duration', 'min_price',
              'origin', 'originCode',  'total_duration',
-             'total_trains', 'trainNumber', 'trainPeriod', 'trainType',   'transporter',
+             'total_trains', 'trainNumber', 'trainPeriod', 'trainType', 'trainNumber',  'transporter',
              'trip_id', 'trip_name',  'trip_rank',
              'vehicleType'] + COLS_TIMEDELTA + COLS_DATE + COLS_PRICE]
     disk_engine = create_engine('sqlite:///' + DB_NAME)
+    logger.info("Start writing to db...")
     df.to_sql('sncf_trips', disk_engine, if_exists='append')
+    logger.info("finished writing to db")
 
 
 def read_from_db():

@@ -1,7 +1,7 @@
 # TRIPS
 
 TRIP1 = {'origin': 'PARIS', 'destination': [
-    'SAINT BRIEUC', 'LYON', 'ANGOULEME', 'LILLE', 'STRASBOURG']}
+    'SAINT BRIEUC']}
 
 
 ALL_TRIPS = [TRIP1]
@@ -25,4 +25,4 @@ headers = {
 
 DB_NAME = 'sncf_trips.db'
 
-LOGGING_PATH = 'scrapper.log'
+LOGGING_FILENAME = 'scrapper'
