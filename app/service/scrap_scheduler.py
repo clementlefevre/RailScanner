@@ -28,17 +28,18 @@ consoleHandler.setFormatter(logFormatter)
 rootLogger.addHandler(consoleHandler)
 
 
-def job():
-    wait_times_mn = random.randrange(1, 58, 1)
-    time.sleep(wait_times_mn * 60)
+def job(wait=True):
+    if wait:
+        wait_times_mn = random.randrange(1, 58, 1)
+        time.sleep(wait_times_mn * 60)
     client = Client(ALL_TRIPS, horizon=40)
     client.get_routes()
 
 
 def main():
-    rootLogger.debug("start working...")
-    job()
-    schedule.every(2).hours.do(job)
+    rootLogger.debug("start scheduler...")
+    job(wait=False)
+    schedule.every(4).hours.do(job)
 
     while True:
         schedule.run_pending()
@@ -46,4 +47,7 @@ def main():
 
 
 if __name__ == '__main__':
+    
+    
+    rootLogger.debug("start scraper...")
     main()
