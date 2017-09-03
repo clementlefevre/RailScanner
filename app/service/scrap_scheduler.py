@@ -5,8 +5,12 @@ import logging
 import sys
 from itertools import product, permutations
 
-from app.config import LOGGING_FILENAME, ALL_TRIPS
+import ipdb
+
+#ipdb.set_trace()
+
 from app.model.client import Client
+from app.config import LOGGING_FILENAME, ALL_TRIPS
 
 
 logFormatter = logging.Formatter(
@@ -26,7 +30,6 @@ rootLogger.addHandler(consoleHandler)
 
 def job():
     wait_times_mn = random.randrange(1, 58, 1)
-
     time.sleep(wait_times_mn * 60)
     client = Client(ALL_TRIPS, horizon=40)
     client.get_routes()

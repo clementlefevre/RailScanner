@@ -2,7 +2,6 @@
 *.csv
 /env/
 /app/static/node_modules/
-/logs/
 /.ipynb_checkpoints
 /.vscode
 *.log
