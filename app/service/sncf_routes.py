@@ -8,7 +8,10 @@ from sqlalchemy import create_engine
 import requests
 from datetime import datetime
 import logging
+
+
 from app.config import URL, headers, DB_NAME
+from app.service.tor import get_tor_session, renew_connection
 
 logger = logging.getLogger("scraper_sncf")
 
@@ -77,15 +80,20 @@ def add_missing_cols_price(df):
 
 def get_routes(origin, destination, date_trip=datetime.now().isoformat()):
     data = get_data(origin, destination, date_trip)
-    time.sleep(10)
+    time.sleep(1*60)
+    
 
     try:
-        response = requests.request("POST", URL, data=data, headers=headers)
+        #response = session.request("POST", URL, data=data, headers=headers)
+        response = requests.request("POST", URL, data=data, headers=headers)  
         response.raise_for_status()
     except Exception as e:
         logger.error(
             "Could not get schedule for {0}-{1} on {2}: ".format(origin, destination, date_trip))
+        #ipdb.set_trace()
+        logger.error(response.text)
         logger.error(e)
+      
         return
 
     
