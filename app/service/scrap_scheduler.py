@@ -32,14 +32,14 @@ def job(wait=True):
     if wait:
         wait_times_mn = random.randrange(1, 58, 1)
         time.sleep(wait_times_mn * 60)
-    client = Client(ALL_TRIPS, horizon=40)
+    client = Client(ALL_TRIPS, horizon=4)
     client.get_routes()
 
 
 def main():
     rootLogger.debug("start scheduler...")
     job(wait=False)
-    schedule.every(4).hours.do(job)
+    schedule.every(1).hours.do(job)
 
     while True:
         schedule.run_pending()
