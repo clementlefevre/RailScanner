@@ -81,10 +81,7 @@ def add_missing_cols_price(df):
 def get_routes(origin, destination, date_trip=datetime.now().isoformat()):
     data = get_data(origin, destination, date_trip)
     time.sleep(1*60)
-<<<<<<< HEAD
     
-=======
->>>>>>> 948c1fdbe024fad19bc924dbdb528895c4b282dd
 
     try:
         #response = session.request("POST", URL, data=data, headers=headers)
