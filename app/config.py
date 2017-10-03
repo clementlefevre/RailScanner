@@ -53,6 +53,4 @@ EMAIL_USER = os.getenv('EMAIL_USER')
 EMAIL_PASSWORD = os.getenv('EMAIL_PASSWORD')
 MAIL_SERVER = 'smtp.world4you.com'
 MAIL_PORT = 587
-MAIL_USE_TLS = True
-MAIL_SUBJECT_PREFIX = '[RailScanner]'
 MAIL_SENDER = 'Railscanner Admin <flask.admin@lefevre.at>'

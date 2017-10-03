@@ -5,15 +5,11 @@ import logging
 import sys
 from itertools import product, permutations
 
-import ipdb
-
-# ipdb.set_trace()
-
 from app.model.client import Client
 from app.config import LOGGING_FILENAME, ALL_TRIPS
 
-
-logFormatter = logging.Formatter(
+logger = logging.getLogger("scraper_sncf")
+''' logFormatter = logging.Formatter(
     "%(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s]  %(message)s")
 rootLogger = logging.getLogger("scraper_sncf")
 rootLogger.setLevel(logging.INFO)
@@ -25,7 +21,7 @@ rootLogger.addHandler(fileHandler)
 
 consoleHandler = logging.StreamHandler()
 consoleHandler.setFormatter(logFormatter)
-rootLogger.addHandler(consoleHandler)
+rootLogger.addHandler(consoleHandler)  '''
 
 
 def job(wait=True):
@@ -37,7 +33,7 @@ def job(wait=True):
 
 
 def main():
-    rootLogger.debug("start scheduler...")
+    logger.debug("start scheduler...")
     job(wait=False)
     schedule.every(1).hours.do(job)
 
@@ -48,5 +44,5 @@ def main():
 
 if __name__ == '__main__':
 
-    rootLogger.debug("start scraper...")
+    logger.debug("start scraper...")
     main()

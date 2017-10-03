@@ -8,7 +8,7 @@ from sqlalchemy import create_engine
 import requests
 from datetime import datetime
 import logging
-import random.choice
+from random import choice
 
 
 from app.config import URL, headers, DB_NAME, PROXIES
@@ -26,7 +26,7 @@ COLS_TIMEDELTA = ['total_duration']
 
 
 def get_proxy():
-    return choice(PROXrandom.IES)
+    return choice(PROXIES)
 
 
 def get_data(origin, destination, date_trip=datetime.now().isoformat()):
@@ -85,12 +85,12 @@ def add_missing_cols_price(df):
 
 def get_routes(origin, destination, date_trip=datetime.now().isoformat()):
     data = get_data(origin, destination, date_trip)
-    #time.sleep(1 * 60)
+    time.sleep(5)
 
     try:
-        logger.error('Get proxy')
         session = requests.Session()
-        proxies = {'http': 'http://46.218.73.162:80'}
+        proxy = get_proxy()
+        proxies = {'http': proxy}
         session.proxies.update(proxies)
         logger.info('IP in use : {}'.format(
             session.get("http://httpbin.org/ip").text))
@@ -101,8 +101,10 @@ def get_routes(origin, destination, date_trip=datetime.now().isoformat()):
         logger.error(
             "Could not get schedule for {0}-{1} on {2}: ".format(origin, destination, date_trip))
         # ipdb.set_trace()
-        logger.error(response.text)
         logger.error(e)
+        if(response is not None):
+            logger.error(response.text)
+        
 
         return
 
