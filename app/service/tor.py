@@ -3,6 +3,9 @@ from stem import Signal
 from stem.control import Controller
 
 
+# https://stackoverflow.com/questions/40926018/pip-install-doesnt-work-invalidschema-missing-dependencies-for-socks-support
+
+
 def get_tor_session():
     session = requests.session()
     # Tor uses the 9050 port as the default socks port
@@ -11,11 +14,12 @@ def get_tor_session():
     return session
 
 
-# signal TOR for a new connection 
+# signal TOR for a new connection
 def renew_connection():
-    with Controller.from_port(port = 9051) as controller:
+    with Controller.from_port(port=9051) as controller:
         controller.authenticate(password="clement2017")
         controller.signal(Signal.NEWNYM)
+
 
 def test_tor_connection():
 
@@ -31,3 +35,7 @@ def test_tor_connection():
     renew_connection()
     session = get_tor_session()
     print(session.get("http://httpbin.org/ip").text)
+
+
+if __name__ == '__main__':
+    test_tor_connection()

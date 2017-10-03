@@ -8,9 +8,10 @@ from sqlalchemy import create_engine
 import requests
 from datetime import datetime
 import logging
+import random.choice
 
 
-from app.config import URL, headers, DB_NAME
+from app.config import URL, headers, DB_NAME, PROXIES
 from app.service.tor import get_tor_session, renew_connection
 
 logger = logging.getLogger("scraper_sncf")
@@ -22,6 +23,10 @@ COLS_DATE = ['departureDate', 'arrivalDate',
              'trip_departureDate', 'trip_arrivalDate', 'scrapped_on']
 
 COLS_TIMEDELTA = ['total_duration']
+
+
+def get_proxy():
+    return choice(PROXrandom.IES)
 
 
 def get_data(origin, destination, date_trip=datetime.now().isoformat()):
@@ -80,23 +85,26 @@ def add_missing_cols_price(df):
 
 def get_routes(origin, destination, date_trip=datetime.now().isoformat()):
     data = get_data(origin, destination, date_trip)
-    time.sleep(1*60)
-    
+    #time.sleep(1 * 60)
 
     try:
-        #response = session.request("POST", URL, data=data, headers=headers)
-        response = requests.request("POST", URL, data=data, headers=headers)  
+        logger.error('Get proxy')
+        session = requests.Session()
+        proxies = {'http': 'http://46.218.73.162:80'}
+        session.proxies.update(proxies)
+        logger.info('IP in use : {}'.format(
+            session.get("http://httpbin.org/ip").text))
+        response = session.request("POST", URL, data=data, headers=headers)
+        #response = requests.request("POST", URL, data=data, headers=headers)
         response.raise_for_status()
     except Exception as e:
         logger.error(
             "Could not get schedule for {0}-{1} on {2}: ".format(origin, destination, date_trip))
-        #ipdb.set_trace()
+        # ipdb.set_trace()
         logger.error(response.text)
         logger.error(e)
-      
-        return
 
-    
+        return
 
     response_dict = response.json()
 

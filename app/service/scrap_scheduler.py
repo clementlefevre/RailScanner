@@ -7,7 +7,7 @@ from itertools import product, permutations
 
 import ipdb
 
-#ipdb.set_trace()
+# ipdb.set_trace()
 
 from app.model.client import Client
 from app.config import LOGGING_FILENAME, ALL_TRIPS
@@ -32,7 +32,7 @@ def job(wait=True):
     if wait:
         wait_times_mn = random.randrange(1, 58, 1)
         time.sleep(wait_times_mn * 60)
-    client = Client(ALL_TRIPS, horizon=4)
+    client = Client(ALL_TRIPS, horizon=40)
     client.get_routes()
 
 
@@ -47,7 +47,6 @@ def main():
 
 
 if __name__ == '__main__':
-    
-    
+
     rootLogger.debug("start scraper...")
     main()
