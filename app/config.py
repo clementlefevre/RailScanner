@@ -2,7 +2,7 @@ import os
 
 # TRIPS
 
-TRIP1 = {'origin': 'PARIS', 'destination': [
+TRIP1 = {'origin': 'PARIS', 'destination': ['NANTES','LILLE','LYON','BORDEAUX','STRASBOURG',
     'SAINT BRIEUC']}
 
 

@@ -34,6 +34,8 @@ def get_data(origin, destination, date_trip=datetime.now().isoformat()):
     null = 'null'
     false = 'false'
     true = 'true'
+    BIKE ='UNFOLDABLE'
+    BIKE = 'NONE'
 
     payload = {"origin": origin, "originCode": null,
                "originLocation": null, "destination": destination,
@@ -51,7 +53,7 @@ def get_data(origin, destination, date_trip=datetime.now().isoformat()):
                     "lastName": null,
                     "firstName": null, "phoneNumer": null,
                     "hanInformation": null}],
-               "animals": [], "bike": "UNFOLDABLE", "withRecliningSeat": false,
+               "animals": [], "bike":BIKE, "withRecliningSeat": false,
                "physicalSpace": null, "fares": [], "withBestPrices": false,
                "highlightedTravel": null, "nextOrPrevious": false,
                "source": "FORM_SUBMIT", "targetPrice": null, "han": false,
@@ -85,25 +87,28 @@ def add_missing_cols_price(df):
 
 def get_routes(origin, destination, date_trip=datetime.now().isoformat()):
     data = get_data(origin, destination, date_trip)
-    time.sleep(5)
+    time.sleep(20)
+    proxy = get_proxy()
 
     try:
         session = requests.Session()
-        proxy = get_proxy()
-        proxies = {'http': proxy}
+        
+        proxies = {'http': str(proxy)}
+        logger.info('Using proxy : {}'.format(proxies))
         session.proxies.update(proxies)
-        logger.info('IP in use : {}'.format(
-            session.get("http://httpbin.org/ip").text))
-        response = session.request("POST", URL, data=data, headers=headers)
+        #logger.info('IP in use : {}'.format(session.get("http://httpbin.org/ip").text))
+        response = session.request("POST", URL, data=data, headers=headers, timeout=20)
         #response = requests.request("POST", URL, data=data, headers=headers)
         response.raise_for_status()
     except Exception as e:
         logger.error(
             "Could not get schedule for {0}-{1} on {2}: ".format(origin, destination, date_trip))
-        # ipdb.set_trace()
+        
         logger.error(e)
-        if(response is not None):
-            logger.error(response.text)
+        try:
+            logger.error('response text :{}'.format(response.text))
+        except UnboundLocalError:
+            logger.error('No response for {}'.format(proxy))
         
 
         return
@@ -113,7 +118,7 @@ def get_routes(origin, destination, date_trip=datetime.now().isoformat()):
     result_list = response_dict['results']
 
     logger.info(
-        "\n Itineraries found for {0}-{1} on {2}: {3}\n".format(origin, destination, date_trip, len(result_list)))
+        "Itineraries found for {0}-{1} on {2}: {3}\n".format(origin, destination, date_trip, len(result_list)))
     df = concat_results(result_list)
     df = add_min_price(df)
 

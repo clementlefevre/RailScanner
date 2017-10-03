@@ -9,24 +9,12 @@ from app.model.client import Client
 from app.config import LOGGING_FILENAME, ALL_TRIPS
 
 logger = logging.getLogger("scraper_sncf")
-''' logFormatter = logging.Formatter(
-    "%(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s]  %(message)s")
-rootLogger = logging.getLogger("scraper_sncf")
-rootLogger.setLevel(logging.INFO)
 
-fileHandler = logging.FileHandler(
-    "{0}/{1}.log".format("app/logs", LOGGING_FILENAME))
-fileHandler.setFormatter(logFormatter)
-rootLogger.addHandler(fileHandler)
-
-consoleHandler = logging.StreamHandler()
-consoleHandler.setFormatter(logFormatter)
-rootLogger.addHandler(consoleHandler)  '''
 
 
 def job(wait=True):
     if wait:
-        wait_times_mn = random.randrange(1, 58, 1)
+        wait_times_mn = random.randrange(1, 30, 1)
         time.sleep(wait_times_mn * 60)
     client = Client(ALL_TRIPS, horizon=40)
     client.get_routes()
