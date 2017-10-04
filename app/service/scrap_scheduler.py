@@ -23,7 +23,7 @@ def job(wait=True):
 def main():
     logger.debug("start scheduler...")
     job(wait=False)
-    schedule.every(1).hours.do(job)
+    schedule.every(4).hours.do(job)
 
     while True:
         schedule.run_pending()
@@ -32,5 +32,5 @@ def main():
 
 if __name__ == '__main__':
 
-    logger.debug("start scraper...")
+    logger.info("start scraper...")
     main()

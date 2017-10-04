@@ -12,7 +12,7 @@ from random import choice
 
 
 from app.config import URL, headers, DB_NAME, PROXIES
-from app.service.tor import get_tor_session, renew_connection
+
 
 logger = logging.getLogger("scraper_sncf")
 
@@ -57,7 +57,7 @@ def get_data(origin, destination, date_trip=datetime.now().isoformat()):
                "physicalSpace": null, "fares": [], "withBestPrices": false,
                "highlightedTravel": null, "nextOrPrevious": false,
                "source": "FORM_SUBMIT", "targetPrice": null, "han": false,
-               "$initial": true, "$queryId": "SRlEN"}
+               }
 
     payload = json.dumps(payload)
     payload = payload.replace("\"null\"", "null").replace(
@@ -213,5 +213,5 @@ def concat_results(json_result):
             df = pd.concat([df, df_result], axis=0)
         except Exception as e:
 
-            print "error rootacause : \n \n", e.args
+            print ("error rootacause : \n \n", e.args)
     return df

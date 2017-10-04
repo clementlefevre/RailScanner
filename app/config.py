@@ -28,6 +28,8 @@ PROXIES = ['176.31.125.111:80',
            '151.80.37.154:3128',
            '178.32.213.128:80']
 
+PROXIES = ['147.135.209.190:1080']
+
 
 URL = "https://www.voyages-sncf.com/proposition/rest/search-travels/outward"
 
