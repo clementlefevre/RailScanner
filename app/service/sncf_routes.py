@@ -94,7 +94,7 @@ def get_routes(origin, destination, date_trip=datetime.now().isoformat()):
         session = requests.Session()
         
         proxies = {'http': str(proxy)}
-        logger.info('Using proxy : {}'.format(proxies))
+        #logger.info('Using proxy : {}'.format(proxies))
         session.proxies.update(proxies)
         #logger.info('IP in use : {}'.format(session.get("http://httpbin.org/ip").text))
         response = session.request("POST", URL, data=data, headers=headers, timeout=20)
@@ -102,7 +102,7 @@ def get_routes(origin, destination, date_trip=datetime.now().isoformat()):
         response.raise_for_status()
     except Exception as e:
         logger.error(
-            "Could not get schedule for {0}-{1} on {2}: ".format(origin, destination, date_trip))
+            "{3} : Could not get schedule for {0}-{1} on {2}: ".format(origin, destination, date_trip,proxy))
         
         logger.error(e)
         try:
