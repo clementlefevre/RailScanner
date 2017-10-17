@@ -4,6 +4,7 @@
 import time
 import json
 import pandas as pd
+import random
 from sqlalchemy import create_engine
 import requests
 from datetime import datetime
@@ -11,7 +12,7 @@ import logging
 from random import choice
 
 
-from app.config import URL, headers, DB_NAME, PROXIES
+from ..config import URL, headers, DB_NAME, PROXIES
 
 
 logger = logging.getLogger("scraper_sncf")
@@ -87,7 +88,8 @@ def add_missing_cols_price(df):
 
 def get_routes(origin, destination, date_trip=datetime.now().isoformat()):
     data = get_data(origin, destination, date_trip)
-    time.sleep(20)
+    wait_times_mn = random.randrange(1, 30, 1)
+    time.sleep(wait_times_mn)
     proxy = get_proxy()
 
     try:
@@ -118,7 +120,7 @@ def get_routes(origin, destination, date_trip=datetime.now().isoformat()):
     result_list = response_dict['results']
 
     logger.info(
-        "Itineraries found for {0}-{1} on {2}: {3}\n".format(origin, destination, date_trip, len(result_list)))
+        "Itineraries found for {0}-{1} on {2}: {3}".format(origin, destination, date_trip, len(result_list)))
     df = concat_results(result_list)
     df = add_min_price(df)
 

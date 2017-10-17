@@ -23,7 +23,7 @@ def job(wait=True):
 def main():
     logger.debug("start scheduler...")
     job(wait=False)
-    schedule.every(4).hours.do(job)
+    schedule.every(1).days.do(job)
 
     while True:
         schedule.run_pending()

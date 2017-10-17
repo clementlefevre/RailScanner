@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 from itertools import product
 from random import shuffle
 import logging
+import time
 
 from app.service import sncf_routes
 
@@ -60,6 +61,7 @@ class Client(object):
             for dt in self.date_range:
                 df_trip = sncf_routes.get_routes(origin, destination, dt)
                 self.schedules = pd.concat([self.schedules, df_trip])
+            time.sleep(30*60)
         self.save_to_db()
 
     def save_to_db(self):
